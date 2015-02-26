@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/build/react-with-addons.js"></script>
+    <script src="js/build/JSXTransformer.js"></script>
+    <style>
+      .PostLine {
+        padding: 0.5em 0.0em;
+      }
+      .PostLine a {
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .vote {
+        font-weight:bold;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="example"></div>
+    <div id="content"></div>
+    <script type="text/jsx">
+      React.render(
+        <h1>This is a forum!</h1>,
+        document.getElementById('example')
+      );
+
+      var Forum = React.createClass({
+        handleUpVote: function(id, event) {
+          for (var i = 0; i < this.state.posts.length; i++) {
+            if (this.state.posts[i].id === id) {
+              var t = [];
+              t[i] = {
+                count: { $set: this.state.posts[i].count + 1 }
+              }
+              var pp = React.addons.update(this.state.posts, t);
+              this.setState({
+                posts: pp,
+                numPosts: this.state.numPosts + 1
+              })
+            }
+          }
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+          // console.log(nextProps, ":;;", nextState);
+          for (var i = 0; i < this.state.posts.length; i++) {
+            if (this.state.posts[i].count !== nextState.posts[i].count) {
+              // console.log(this.state.posts[i], nextState.posts[i])
+              return true;
+            }
+          }
+          return false; //nextProps.id !== this.props.id;
+        },
+        totalPosts: function() {
+          // var c = ;
+          console.log(c);
+          return c;
+        },
+        getInitialState: function() {
+          return {
+            posts: this.props.posts,
+            numPosts: this.props.posts.reduce(function(p, c) { return p + c.count; }, 0)
+          }
+        },
+        render: function() {
+          // this.set
+          return (
+            <div className="Forum">
+              Welcome to Le Forums {this.state.numPosts} posts
+              <ForumList posts={this.state.posts} onUpVote={this.handleUpVote} />
+            </div>
+          )
+        }
+      });
+
+      var ForumList = React.createClass({
+        getInitialState: function() {
+          return {
+            posts: this.props.posts.sort(function(a, b) {
+              return b.count - a.count;
+            })
+          }
+        },
+        incrementPost: function(postId, post) {
+          var posts = this.state.posts;
+          for (var i = 0; i < posts.length; i++) {
+            if (posts[i].id === postId) {
+              posts[i] = post;
+            }
+          }
+          var n = posts.sort(function(a, b) {
+            return b.count - a.count;
+          });
+          this.setState({ posts: n });
+          this.props.onUpVote.bind(null, postId);
+        },
+        render: function() {
+          var self = this;
+          var nodes = this.state.posts.map(function(post) {
+            return <ForumPost key={post.id} locked={post.active} post={post} onUpVote={self.incrementPost} />
+          });
+          return (
+            <div className="ForumList">{nodes}</div>
+          )
+        }
+      });
+
+      var ForumPost = React.createClass({
+        getInitialState: function() {
+          return { locked: this.props.active, numPosts: this.props.post.count, post: this.props.post }
+        },
+        incrementPost: function(count) {
+          var post = React.addons.update(this.state.post, { count: { $set: this.state.post.count + 1 } })
+          this.setState({ post: post });
+          this.props.onUpVote(post.id, post);
+        },
+
+        render: function() {
+          var post = this.props.post;
+          return (
+            <div className="PostLine" key={post.id}>
+              <a href="/posts/{post.id}">{post.title} ({this.state.post.count})</a>&nbsp;
+              <UpPost key={post.id} count={post.count} onUpVote={this.incrementPost} />
+            </div>
+          );
+        }
+      })
+
+      var UpPost = React.createClass({
+        render: function() {
+          return (
+            <span onClick={this.props.onUpVote} className="vote">&#x21ea;</span>
+          )
+        }
+      })
+      var POSTS = [
+        { "id": 3, "title": "Breakfast Juice", "count": 40, "active": true },
+        { "id": 2, "title": "The Order 1888 is really short", "count": 22, "active": true },
+        { "id": 1, "title": "Homeworld is coming", "count": 102, "active": false },
+        { "id": 4, "title": "The radio plays, 'Take Me To Church' too much", "count": 13 },
+      ]
+
+      React.render(
+        <Forum posts={POSTS} />,
+        document.getElementById('content')
+      );
+    </script>
+  </body>
+</html>
