@@ -22,7 +22,7 @@
     <div id="content"></div>
     <script type="text/jsx">
       React.render(
-        <h1>This is a poll!</h1>,
+        <h1>Vote for your favorite Adventure Time character!</h1>,
         document.getElementById('example')
       );
 
@@ -113,13 +113,13 @@
           return (
             <div className="VoteLine" key={vote.id}>
               <a href="/votes/{vote.id}">{vote.title} ({this.state.vote.count})</a>&nbsp;
-              <UpPost key={vote.id} count={vote.count} onUpVote={this.incrementVote} />
+              <UpVote key={vote.id} count={vote.count} onUpVote={this.incrementVote} />
             </div>
           );
         }
       })
 
-      var UpPost = React.createClass({
+      var UpVote = React.createClass({
         render: function() {
           return (
             <span onClick={this.props.onUpVote} className="vote">&#x21ea;</span>
@@ -127,10 +127,11 @@
         }
       })
       var VOTE_ITEMS = [
-        { "id": 3, "title": "Breakfast Juice", "count": 40, "active": true },
-        { "id": 2, "title": "The Order 1888 is really short", "count": 22, "active": true },
-        { "id": 1, "title": "Homeworld is coming", "count": 102, "active": false },
-        { "id": 4, "title": "The radio plays, 'Take Me To Church' too much", "count": 13 },
+        { "id": 3, "title": "Finn the Human", "count": 40 },
+        { "id": 2, "title": "Jake The Dog", "count": 22 },
+        { "id": 1, "title": "Princess Bubblegum", "count": 102 },
+        { "id": 4, "title": "The Ice King", "count": 13 },
+        { "id": 5, "title": "BMO", "count": 128 },
       ]
 
       React.render(
