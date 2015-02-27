@@ -4,10 +4,10 @@
     <script src="js/build/react-with-addons.js"></script>
     <script src="js/build/JSXTransformer.js"></script>
     <style>
-      .PostLine {
+      .VoteLine {
         padding: 0.5em 0.0em;
       }
-      .PostLine a {
+      .VoteLine a {
         text-decoration: none;
         font-weight: bold;
       }
@@ -22,106 +22,101 @@
     <div id="content"></div>
     <script type="text/jsx">
       React.render(
-        <h1>This is a forum!</h1>,
+        <h1>This is a poll!</h1>,
         document.getElementById('example')
       );
 
-      var Forum = React.createClass({
+      var Vote = React.createClass({
         handleUpVote: function(id, event) {
-          for (var i = 0; i < this.state.posts.length; i++) {
-            if (this.state.posts[i].id === id) {
+          for (var i = 0; i < this.state.votes.length; i++) {
+            if (this.state.votes[i].id === id) {
               var t = [];
               t[i] = {
-                count: { $set: this.state.posts[i].count + 1 }
+                count: { $set: this.state.votes[i].count + 1 }
               }
-              var pp = React.addons.update(this.state.posts, t);
+              var pp = React.addons.update(this.state.votes, t);
               this.setState({
-                posts: pp,
-                numPosts: this.state.numPosts + 1
+                votes: pp,
+                numVotes: this.state.numVotes + 1
               })
             }
           }
         },
         shouldComponentUpdate: function(nextProps, nextState) {
           // console.log(nextProps, ":;;", nextState);
-          for (var i = 0; i < this.state.posts.length; i++) {
-            if (this.state.posts[i].count !== nextState.posts[i].count) {
-              // console.log(this.state.posts[i], nextState.posts[i])
+          for (var i = 0; i < this.state.votes.length; i++) {
+            if (this.state.votes[i].count !== nextState.votes[i].count) {
+              // console.log(this.state.votes[i], nextState.votes[i])
               return true;
             }
           }
           return false; //nextProps.id !== this.props.id;
         },
-        totalPosts: function() {
-          // var c = ;
-          console.log(c);
-          return c;
-        },
         getInitialState: function() {
           return {
-            posts: this.props.posts,
-            numPosts: this.props.posts.reduce(function(p, c) { return p + c.count; }, 0)
+            votes: this.props.votes,
+            numVotes: this.props.votes.reduce(function(p, c) { return p + c.count; }, 0)
           }
         },
         render: function() {
           // this.set
           return (
-            <div className="Forum">
-              Welcome to Le Forums {this.state.numPosts} posts
-              <ForumList posts={this.state.posts} onUpVote={this.handleUpVote} />
+            <div className="Vote">
+              Welcome to Le Poll. {this.state.numVotes} votes
+              <VoteList votes={this.state.votes} onUpVote={this.handleUpVote} />
             </div>
           )
         }
       });
 
-      var ForumList = React.createClass({
+      var VoteList = React.createClass({
         getInitialState: function() {
           return {
-            posts: this.props.posts.sort(function(a, b) {
+            votes: this.props.votes.sort(function(a, b) {
               return b.count - a.count;
             })
           }
         },
-        incrementPost: function(postId, post) {
-          var posts = this.state.posts;
-          for (var i = 0; i < posts.length; i++) {
-            if (posts[i].id === postId) {
-              posts[i] = post;
+        incrementVote: function(voteId, vote) {
+          var votes = this.state.votes;
+          for (var i = 0; i < votes.length; i++) {
+            if (votes[i].id === voteId) {
+              votes[i] = vote;
             }
           }
-          var n = posts.sort(function(a, b) {
+          var n = votes.sort(function(a, b) {
             return b.count - a.count;
           });
-          this.setState({ posts: n });
-          this.props.onUpVote.bind(null, postId);
+          this.setState({ votes: n });
+          this.props.onUpVote.bind(null, voteId);
         },
         render: function() {
           var self = this;
-          var nodes = this.state.posts.map(function(post) {
-            return <ForumPost key={post.id} locked={post.active} post={post} onUpVote={self.incrementPost} />
+          var nodes = this.state.votes.map(function(vote) {
+            return <VotePost key={vote.id} locked={vote.active} vote={vote} onUpVote={self.incrementVote} />
           });
           return (
-            <div className="ForumList">{nodes}</div>
+            <div className="VoteList">{nodes}</div>
           )
         }
       });
 
-      var ForumPost = React.createClass({
+      var VotePost = React.createClass({
         getInitialState: function() {
-          return { locked: this.props.active, numPosts: this.props.post.count, post: this.props.post }
+          return { locked: this.props.active, numVotes: this.props.vote.count, vote: this.props.vote }
         },
-        incrementPost: function(count) {
-          var post = React.addons.update(this.state.post, { count: { $set: this.state.post.count + 1 } })
-          this.setState({ post: post });
-          this.props.onUpVote(post.id, post);
+        incrementVote: function(count) {
+          var vote = React.addons.update(this.state.vote, { count: { $set: this.state.vote.count + 1 } })
+          this.setState({ vote: vote });
+          this.props.onUpVote(vote.id, vote);
         },
 
         render: function() {
-          var post = this.props.post;
+          var vote = this.props.vote;
           return (
-            <div className="PostLine" key={post.id}>
-              <a href="/posts/{post.id}">{post.title} ({this.state.post.count})</a>&nbsp;
-              <UpPost key={post.id} count={post.count} onUpVote={this.incrementPost} />
+            <div className="VoteLine" key={vote.id}>
+              <a href="/votes/{vote.id}">{vote.title} ({this.state.vote.count})</a>&nbsp;
+              <UpPost key={vote.id} count={vote.count} onUpVote={this.incrementVote} />
             </div>
           );
         }
@@ -134,7 +129,7 @@
           )
         }
       })
-      var POSTS = [
+      var VOTE_ITEMS = [
         { "id": 3, "title": "Breakfast Juice", "count": 40, "active": true },
         { "id": 2, "title": "The Order 1888 is really short", "count": 22, "active": true },
         { "id": 1, "title": "Homeworld is coming", "count": 102, "active": false },
@@ -142,7 +137,7 @@
       ]
 
       React.render(
-        <Forum posts={POSTS} />,
+        <Vote votes={VOTE_ITEMS} />,
         document.getElementById('content')
       );
     </script>
