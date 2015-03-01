@@ -27,6 +27,11 @@
       );
 
       var Vote = React.createClass({
+        getInitialState: function() {
+          return {
+            votes: this.props.votes.sort(function(a, b) { return b.count - a.count; })
+          }
+        },
         handleUpVote: function(id, event) {
           for (var i = 0; i < this.state.votes.length; i++) {
             if (this.state.votes[i].id === id) {
@@ -35,14 +40,18 @@
                 count: { $set: this.state.votes[i].count + 1 }
               }
               var pp = React.addons.update(this.state.votes, t);
-              this.setState({
-                votes: pp,
-                numVotes: this.state.numVotes + 1
-              })
+              pp.sort(function(a, b) {
+                return b.count - a.count;
+              });
+              this.setState({ votes: pp });
             }
           }
+
         },
         shouldComponentUpdate: function(nextProps, nextState) {
+          if (this.state.votes.length < nextState.votes.length) {
+            return true;
+          }
           for (var i = 0; i < this.state.votes.length; i++) {
             if (this.state.votes[i].count !== nextState.votes[i].count) {
               return true;
@@ -50,47 +59,27 @@
           }
           return false;
         },
-        getInitialState: function() {
-          return {
-            votes: this.props.votes,
-            numVotes: this.props.votes.reduce(function(p, c) { return p + c.count; }, 0)
-          }
-        },
         render: function() {
+          var v = this.state.votes;
           return (
             <div className="Vote">
-              Welcome to Le Poll. {this.state.numVotes} votes
-              <VoteList votes={this.state.votes} onUpVote={this.handleUpVote} />
+              Welcome to Le Vote: {v.reduce(function(p, c) { return p + c.count}, 0)} votes
+              <VoteList votes={v} onUpVote={this.handleUpVote} />
             </div>
           )
         }
       });
 
       var VoteList = React.createClass({
-        getInitialState: function() {
-          return {
-            votes: this.props.votes.sort(function(a, b) {
-              return b.count - a.count;
-            })
-          }
-        },
-        incrementVote: function(voteId, vote) {
-          var votes = this.state.votes;
-          for (var i = 0; i < votes.length; i++) {
-            if (votes[i].id === voteId) {
-              votes[i] = vote;
-            }
-          }
-          var n = votes.sort(function(a, b) {
-            return b.count - a.count;
-          });
-          this.setState({ votes: n });
-          this.props.onUpVote.bind(null, voteId);
+        onUpVote: function(voteId) {
+          this.props.onUpVote(voteId);
         },
         render: function() {
-          var self = this;
-          var nodes = this.state.votes.map(function(vote) {
-            return <VotePost key={vote.id} locked={vote.active} vote={vote} onUpVote={self.incrementVote} />
+          var self, nodes;
+
+          self = this;
+          nodes = this.props.votes.map(function(vote) {
+            return <VotePost key={vote.id} vote={vote} onUpVote={self.onUpVote} />
           });
           return (
             <div className="VoteList">{nodes}</div>
@@ -99,21 +88,14 @@
       });
 
       var VotePost = React.createClass({
-        getInitialState: function() {
-          return { locked: this.props.active, numVotes: this.props.vote.count, vote: this.props.vote }
+        onUpVote: function(voteId) {
+          this.props.onUpVote(voteId);
         },
-        incrementVote: function(count) {
-          var vote = React.addons.update(this.state.vote, { count: { $set: this.state.vote.count + 1 } })
-          this.setState({ vote: vote });
-          this.props.onUpVote(vote.id, vote);
-        },
-
         render: function() {
-          var vote = this.props.vote;
           return (
-            <div className="VoteLine" key={vote.id}>
-              <a href="/votes/{vote.id}">{vote.title} ({this.state.vote.count})</a>&nbsp;
-              <UpVote key={vote.id} count={vote.count} onUpVote={this.incrementVote} />
+            <div className="VoteLine" key={this.props.vote.id}>
+              <a href="/votes/{this.props.vote.id}">{this.props.vote.title} ({this.props.vote.count})</a>&nbsp;
+              <UpVote key={this.props.vote.id} onUpVote={this.onUpVote.bind(null, this.props.vote.id)} />
             </div>
           );
         }
@@ -125,12 +107,13 @@
             <span onClick={this.props.onUpVote} className="vote">&#x21ea;</span>
           )
         }
-      })
+      });
+
       var VOTE_ITEMS = [
         { "id": 3, "title": "Finn the Human", "count": 40 },
         { "id": 2, "title": "Jake The Dog", "count": 22 },
         { "id": 1, "title": "Princess Bubblegum", "count": 102 },
-        { "id": 4, "title": "The Ice King", "count": 13 },
+        { "id": 4, "title": "The Ice King", "count": 20 },
         { "id": 5, "title": "BMO", "count": 128 },
       ]
 
