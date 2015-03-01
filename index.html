@@ -15,6 +15,15 @@
         font-weight:bold;
         cursor: pointer;
       }
+      .add-form input {
+        padding: 0.5em;
+        margin: 0.5em;
+        border: 1px solid black;
+      }
+      .add-button {
+        margin-left: 0.5em;
+        background-color: ;
+      }
     </style>
   </head>
   <body>
@@ -31,6 +40,11 @@
           return {
             votes: this.props.votes.sort(function(a, b) { return b.count - a.count; })
           }
+        },
+        addNewVotee: function(e, votee) {
+          var newVotes = React.addons.update(this.state.votes, { $push: [{ "title": votee, "count": 0, id: this.state.votes.length + 1 }] });
+          this.setState({ votes: newVotes });
+          e.preventDefault();
         },
         handleUpVote: function(id, event) {
           for (var i = 0; i < this.state.votes.length; i++) {
@@ -65,10 +79,26 @@
             <div className="Vote">
               Welcome to Le Vote: {v.reduce(function(p, c) { return p + c.count}, 0)} votes
               <VoteList votes={v} onUpVote={this.handleUpVote} />
+              <AddNewItem onSubmit={this.addNewVotee} />
             </div>
           )
         }
       });
+
+      var AddNewItem = React.createClass({
+        onSubmit: function(e) {
+          var newVotee = this.refs.newVotee.getDOMNode().value.trim();
+          this.props.onSubmit(e, newVotee);
+        },
+        render: function() {
+          return (
+            <form method="POST" onSubmit={this.onSubmit} className="add-form">
+              <input type="text" placeholder="Character Name" ref="newVotee" />
+              <input type="submit" value="Add" className="add-button" />
+            </form>
+          )
+        }
+      })
 
       var VoteList = React.createClass({
         onUpVote: function(voteId) {
