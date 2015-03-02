@@ -41,6 +41,14 @@
         margin-left: 0.5em;
         background-color: ;
       }
+      .noselect {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
     </style>
   </head>
   <body>
@@ -140,7 +148,7 @@
         },
         render: function() {
           return (
-            <div className="VoteLine" key={this.props.vote.id}>
+            <div className="VoteLine noselect" key={this.props.vote.id}>
               <a href="/votes/{this.props.vote.id}">{this.props.vote.title} ({this.props.vote.count})</a>&nbsp;
               <UpVote key={this.props.vote.id} onUpVote={this.onUpVote.bind(null, this.props.vote.id)} />
             </div>
