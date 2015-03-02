@@ -44,15 +44,9 @@
     </style>
   </head>
   <body>
-    <div id="example"></div>
     <div id="content"></div>
     <script type="text/jsx">
       var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
-
-      React.render(
-        <h1>Most popular character on Adventure Time?</h1>,
-        document.getElementById('example')
-      );
 
       var Vote = React.createClass({
         getInitialState: function() {
@@ -171,7 +165,10 @@
       ]
 
       React.render(
-        <Vote votes={VOTE_ITEMS} />,
+        <div>
+          <h1>Most popular character on Adventure Time?</h1>
+          <Vote votes={VOTE_ITEMS} />
+        </div>,
         document.getElementById('content')
       );
     </script>
