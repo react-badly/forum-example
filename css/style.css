@@ -1,0 +1,45 @@
+* {
+  font-family: helvetica;
+}
+.VoteLine {
+  padding: 0.5em 0.0em;
+}
+.VoteLine a {
+  text-decoration: none;
+  font-weight: bold;
+}
+.vote {
+  font-weight:bold;
+  cursor: pointer;
+}
+.example-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+.example-enter.example-enter-active {
+  opacity: 1;
+}
+.example-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+.example-leave.example-leave-active {
+  opacity: 0.01;
+}
+.add-form input {
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 1px solid black;
+}
+.add-button {
+  margin-left: 0.5em;
+  background-color: ;
+}
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
